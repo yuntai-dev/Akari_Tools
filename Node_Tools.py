@@ -1,7 +1,7 @@
 '''
 Author: your name
 Date: 2020-10-04 22:32:46
-LastEditTime: 2021-05-07 11:52:16
+LastEditTime: 2021-05-13 11:23:57
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: \Addon\Import_Hdri.py
@@ -31,20 +31,62 @@ C = bpy.context
 O = bpy.ops
 
 class Import_Hdri_node(bpy.types.Operator):
-    bl_idname = "hdri.nodegroup"
-    bl_label = "hdri"
-    def execute(self,context):
-        blendfile = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'Blender Node')
-        blendfile = os.path.join(blendfile, 'HDRI_World.blend')
-        section   = 'NodeTree'
-        nodegroups    = ['HDRI_World']
+	bl_idname = "hdri.nodegroup"
+	bl_label = "hdri"
+	def execute(self,context):
+		
+		Worldnode = bpy.data.worlds['World'].node_tree
+		OPnode = bpy.data.worlds['World'].node_tree.nodes.active
+		OPnodeloc = OPnode.location
+		HDRnodelocoff = mathutils.Vector((-200.0, 0.0))
+		Texnodelocoff = mathutils.Vector((-350.0, 0.0))
+		Mapnodelocoff = mathutils.Vector((-200.0, 0.0))
+		Texcoordnodelocoff = mathutils.Vector((-200.0, 0.0))
 
-        directory = os.path.join(blendfile, section)
-        
-        for node in nodegroups:  
-            filename  = node
-            bpy.ops.wm.link(filename=filename, directory=directory)
-        return{'FINISHED'}
+		blendfile = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'Blender Node')
+		blendfile = os.path.join(blendfile, 'HDRI_World.blend')
+		section   = 'NodeTree'
+		nodegroups    = 'HDRI_World'
+		directory = os.path.join(blendfile, section)
+		
+		bpy.ops.wm.link(filename=nodegroups, directory=directory)
+		bpy.ops.node.add_node(type="ShaderNodeGroup", use_transform=True, settings=[{"name":"node_tree", "value":"bpy.data.node_groups['HDRI_World']"}])
+		HDRnode = bpy.data.worlds['World'].node_tree.nodes.active
+		HDRBack = HDRnode.inputs[1]
+		HDRBack.default_value = (0.0005,0.0005,0.0005,1)
+		
+		HDRnode.location = OPnodeloc + HDRnodelocoff
+		HDRnodeloc = HDRnode.location
+		Worldnode.links.new(HDRnode.outputs[0], OPnode.inputs[0])
+		
+		HDRfile = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'HDRI')
+		HDRfileTex = os.path.join(HDRfile, 'red_blue_mix_a.exr')
+		bpy.ops.image.open(filepath=HDRfileTex,
+							directory=HDRfile,
+							relative_path=True,
+							show_multiview=False)        
+		Texture = bpy.data.images['red_blue_mix_a.exr'] 
+		bpy.ops.node.add_node(type="ShaderNodeTexEnvironment", use_transform=True)
+		Texnode = bpy.data.worlds['World'].node_tree.nodes.active
+		Texnode.location = HDRnodeloc + Texnodelocoff
+		Texnodeloc = Texnode.location
+		print(Texnode.location)
+		print(HDRnodeloc)
+		Worldnode.links.new(Texnode.outputs[0], HDRnode.inputs[0])
+		Texnode.image = Texture
+
+		bpy.ops.node.add_node(type="ShaderNodeMapping", use_transform=True)
+		Mapnode = bpy.data.worlds['World'].node_tree.nodes.active
+		Mapnode.location = Texnodeloc + Mapnodelocoff
+		Mapnodeloc = Mapnode.location
+		Worldnode.links.new(Mapnode.outputs[0], Texnode.inputs[0])
+
+		bpy.ops.node.add_node(type="ShaderNodeTexCoord", use_transform=True)
+		Texcoordnode = bpy.data.worlds['World'].node_tree.nodes.active
+		Texcoordnode.location = Mapnodeloc + Texcoordnodelocoff
+		Worldnode.links.new(Texcoordnode.outputs[0], Mapnode.inputs[0])
+
+		return{'FINISHED'}
 
 class Import_SSS_mat(bpy.types.Operator):
     
@@ -143,6 +185,7 @@ class Import_Texture_Maps(Operator):
 			SSSnodeloc = SSSnode.location
 			
 			nodetree.links.new(SSSnode.outputs[0], OPnode.inputs[0])
+		
 			SSSmatInD = bpy.data.node_groups['SSS_Mat'].inputs['DIF']
 			SSSmatInO = bpy.data.node_groups['SSS_Mat'].inputs['ORM']
 			SSSmatInN = bpy.data.node_groups['SSS_Mat'].inputs['NRM']
