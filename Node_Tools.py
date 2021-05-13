@@ -1,7 +1,7 @@
 '''
 Author: your name
 Date: 2020-10-04 22:32:46
-LastEditTime: 2021-05-13 16:45:55
+LastEditTime: 2021-05-13 17:41:03
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: \Addon\Import_Hdri.py
@@ -204,9 +204,9 @@ class Import_Texture_Maps(Operator):
 			SSSnode.location = OPnodeloc + SSSnodelocoff
 			SSSnodeloc = SSSnode.location
 			
-			SSSNorP = SSSnode.inputs[6]
+			SSSNorP = SSSnode.inputs[7]
 			SSSNorP.default_value = (1)
-			SSSNorI = SSSnode.inputs[7]
+			SSSNorI = SSSnode.inputs[8]
 			SSSNorI.default_value = (1)
 			
 			nodetree.links.new(SSSnode.outputs[0], OPnode.inputs[0])
