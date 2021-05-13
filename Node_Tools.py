@@ -1,7 +1,7 @@
 '''
 Author: your name
 Date: 2020-10-04 22:32:46
-LastEditTime: 2021-05-13 11:23:57
+LastEditTime: 2021-05-13 16:45:55
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: \Addon\Import_Hdri.py
@@ -89,23 +89,43 @@ class Import_Hdri_node(bpy.types.Operator):
 		return{'FINISHED'}
 
 class Import_SSS_mat(bpy.types.Operator):
-    
-    bl_idname = "mat.sssnodegroup"
-    bl_label = "mat"
-    testname = 'test1'
+	bl_idname = "mat.sssnodegroup"
+	bl_label = "mat"
+	testname = 'test1'
+	
+	def execute(self,context):
 
-    def execute(self,context):
-        blendfile = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'Blender Node')
-        blendfile = os.path.join(blendfile, 'SSS_Mat.blend')
-        section   = '\\NodeTree\\'
-        nodegroups    = ['SSS_Mat']
-        
-        directory = blendfile + section
-  
-        for node in nodegroups:  
-            filename  = node
-            bpy.ops.wm.link(filename=filename, directory=directory)
-        return{'FINISHED'}
+
+		selobj_list = bpy.context.active_object                 #获取选中的模型
+		selobj_name = selobj_list.name_full                      #获取选中模型的名称
+		actmat = bpy.data.objects[selobj_name].active_material   #获取选中模型的材质
+		actmat_name = actmat.name_full
+		actmat_nameUP = actmat_name.upper()
+		nodetree = bpy.data.materials[actmat_name].node_tree
+
+		OPnode = bpy.data.materials[actmat_name].node_tree.nodes.active
+		OPnodeloc = OPnode.location
+		SSSnodelocoff = mathutils.Vector((-200.0, 0.0))
+		
+		blendfile = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'Blender Node')
+		blendfile = os.path.join(blendfile, 'SSS_Mat.blend')
+		section   = '\\NodeTree\\'
+		nodegroups    = 'SSS_Mat'
+		directory = blendfile + section
+		
+		bpy.ops.wm.link(filename=nodegroups, directory=directory)
+		bpy.ops.node.add_node(type="ShaderNodeGroup", use_transform=True, settings=[{"name":"node_tree", "value":"bpy.data.node_groups['SSS_Mat']"}])
+		SSSnode = bpy.data.materials[actmat_name].node_tree.nodes.active
+		SSSnode.location = OPnodeloc + SSSnodelocoff
+
+		SSSNorP = SSSnode.inputs[7]
+		SSSNorP.default_value = (0)
+		SSSNorI = SSSnode.inputs[8]
+		SSSNorI.default_value = (0)
+
+		nodetree.links.new(SSSnode.outputs[0], OPnode.inputs[0])
+		
+		return{'FINISHED'}
 
 
 class Choose_TexOperator(bpy.types.Operator):
@@ -183,6 +203,11 @@ class Import_Texture_Maps(Operator):
 			SSSnode = bpy.data.materials[actmat_name].node_tree.nodes.active
 			SSSnode.location = OPnodeloc + SSSnodelocoff
 			SSSnodeloc = SSSnode.location
+			
+			SSSNorP = SSSnode.inputs[6]
+			SSSNorP.default_value = (1)
+			SSSNorI = SSSnode.inputs[7]
+			SSSNorI.default_value = (1)
 			
 			nodetree.links.new(SSSnode.outputs[0], OPnode.inputs[0])
 		
