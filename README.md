@@ -1,9 +1,18 @@
+<!--
+ * @Author: your name
+ * @Date: 2021-05-13 11:50:38
+ * @LastEditTime: 2021-05-18 13:27:09
+ * @LastEditors: your name
+ * @Description: In User Settings Edit
+ * @FilePath: \UI_Teste:\OneDrive\Python\Akari_Tools\README.md
+-->
 # Akari_Tools
 内置自定义HDRI和SSSmat节点组
 
 3Dview工具
 
 Paralleledit：按住alt选择循环线，点按功能以间隔精简并排线
+![images](https://github.com/BakaAkari/Images_lib/blob/main/%E5%8A%A8%E7%94%BB.gif)s
 
 Loopedit：按住ctrl+alt选择并排线，点按功能以间隔精简循环线
 
