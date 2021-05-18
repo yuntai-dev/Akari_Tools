@@ -1,7 +1,7 @@
 '''
 Author: your name
 Date: 2021-03-19 18:49:55
-LastEditTime: 2021-05-07 14:20:42
+LastEditTime: 2021-05-18 12:44:03
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: \Test_addon\view_tool.py
@@ -27,35 +27,38 @@ class Collection_rename(bpy.types.Operator):
         for s in collobjlist:
             if s.type=='MESH':
                 incollmat.append(s.active_material)
-            print(bpy.context.material_slot)
 
 
-        # for i,o in enumerate(collobjlist):
-        #     o.name = collname+'_'+str(i+1).zfill(2)
-        #     objmat = bpy.data.objects[o.name_full].active_material
-        #     if o.type=='MESH':
-        #         objmatname = objmat.name
-        #         Matusers = bpy.data.materials[objmatname].users
-        #         if collname != objmatname:
-        #             if Matusers == 1:
-        #                 # print('oneuser')
-        #                 objmat.name = collname
-        #                 bpy.data.collections[collname].color_tag = 'NONE'
-        #             else:
-        #                 print('maxuser')
-                        
-                        
-        #                 # if Matusers <= len(incollmat):
-        #                 #     print('test')
-        #                 #     # objmat.name = collname
-        #                 #     # bpy.data.collections[collname].color_tag = 'NONE'
-        #                 # else:
-        #                 #     print('Multi-user')
-        #                 #     bpy.data.collections[collname].color_tag = 'COLOR_05'
-        #         else:
-        #             bpy.data.collections[collname].color_tag = 'NONE'
-        #     else:
-        #         print('no')
+
+
+        for i,o in enumerate(collobjlist):
+            if o.type=='MESH':                                      #检测对象是否为mesh
+                print('mesh')
+                o.name = collname+'_'+str(i+1).zfill(2)             #重命名
+
+                objmat = bpy.data.objects[o.name_full].active_material
+                objmat.name = collname
+                objmatname = objmat.name
+                Matusers = bpy.data.materials[objmatname].users
+                    
+                if Matusers == 1:
+                    print('matusers == 1')
+                    bpy.data.collections[collname].color_tag = 'NONE'
+                else:
+                    print('matusers > 1')
+                    if Matusers <= len(incollmat):
+                        # print('test')
+                        objmat.name = collname
+                        bpy.data.collections[collname].color_tag = 'NONE'
+                    else:
+                        print('Multi-user')
+                        self.report({'ERROR'}, '材质用户数大于1')
+                        bpy.data.collections[collname].color_tag = 'COLOR_05'
+            else:
+                print('non name')
+                bpy.data.collections[collname].color_tag = 'NONE'
+        else:
+            print('no')
         
         return{'FINISHED'}
 

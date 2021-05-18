@@ -1,7 +1,7 @@
 '''
 Author: your name
 Date: 2020-10-04 22:32:46
-LastEditTime: 2021-05-13 17:41:03
+LastEditTime: 2021-05-17 16:54:11
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: \Addon\Import_Hdri.py
@@ -180,10 +180,10 @@ class Import_Texture_Maps(Operator):
 		SSS_Tex = SSS_DIF + SSS_ORM + SSS_NRM
 		SSSmatIP = ['DIF'] + ['ORM'] + ['NRM']
 		
-		print(actmat_name)
-		print(list_file)
-		print(TexNinMatNUP)
-		print(",".join(TexNinMatNUP))
+		# print(actmat_nameUP)
+		# print(list_file)
+		# print(TexNinMatNUP)
+		# print(",".join(TexNinMatNUP))
 
 		if actmat_nameUP in ",".join(TexNinMatNUP):
 			OPnode = bpy.data.materials[actmat_name].node_tree.nodes.active
@@ -210,21 +210,18 @@ class Import_Texture_Maps(Operator):
 			SSSNorI.default_value = (1)
 			
 			nodetree.links.new(SSSnode.outputs[0], OPnode.inputs[0])
-		
-			SSSmatInD = bpy.data.node_groups['SSS_Mat'].inputs['DIF']
-			SSSmatInO = bpy.data.node_groups['SSS_Mat'].inputs['ORM']
-			SSSmatInN = bpy.data.node_groups['SSS_Mat'].inputs['NRM']
 			
 			Texmap = {SSS_Tex[0]:SSSmatIP[0],SSS_Tex[1]:SSSmatIP[1],SSS_Tex[2]:SSSmatIP[2]}
 			Downlocoff = mathutils.Vector((0.0, -300.0))
 			
 			for i in range(0, len(SSS_Tex)):
-				print(i)
 				Tex = SSS_Tex[i]
+				print('Tex:',Tex)
+				SpStr = str(Tex.split('_'))
+				print(SpStr)
 				
 				bpy.ops.image.open(filepath=selpath+Tex, directory=selpath, files=[{"name":Tex, "name":Tex}], relative_path=True, show_multiview=False)        #根据路径和筛选条件导入指定路径下的贴图文件
 				Texture = bpy.data.images[Tex]                                                      #遍历获取DIF图像
-				Texcolorspace = Texture.colorspace_settings.name
 				
 				if Texmap[SSS_Tex[i]] == 'DIF':                                                 #判断图像关键字类型，ORM和NRM色彩空间设定为non-color
 					Texture.colorspace_settings.name = 'sRGB'
