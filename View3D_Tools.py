@@ -1,7 +1,7 @@
 '''
 Author: your name
 Date: 2021-03-19 18:49:55
-LastEditTime: 2021-05-18 12:44:03
+LastEditTime: 2021-05-19 14:30:05
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: \Test_addon\view_tool.py
@@ -94,7 +94,15 @@ class CleanNormalOperator(bpy.types.Operator):
         for o in selection:
             try:
                 bpy.context.view_layer.objects.active = o
+                bpy.ops.object.editmode_toggle()
+                bpy.ops.mesh.select_all(action='SELECT')
+                bpy.ops.mesh.mark_sharp(clear=True)
+                bpy.ops.mesh.mark_seam(clear=True)
+                bpy.ops.transform.edge_crease(value=-1)
+                bpy.ops.transform.edge_bevelweight(value=-1)
+                bpy.ops.object.editmode_toggle()
                 bpy.ops.mesh.customdata_custom_splitnormals_clear()
+
             except:
                 print("Object has no custom split normals: " + o.name + ", skipping")
         return {'FINISHED'}
