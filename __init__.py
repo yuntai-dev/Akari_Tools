@@ -1,7 +1,7 @@
 '''
 Author: your name
 Date: 2020-10-01 17:47:39
-LastEditTime: 2021-05-13 16:32:33
+LastEditTime: 2021-05-21 15:06:06
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: \Addon\__init__.py
@@ -24,7 +24,7 @@ bl_info = {
     "author" : "Baka_Akari",
     "description" : "Akari Toolbag",
     "blender" : (2, 90, 0),
-    "version" : (0, 0, 1, 4),
+    "version" : (0, 0, 1, 6),
     "location" : "",
     "warning" : "Developing", 
 }
@@ -35,11 +35,11 @@ from bpy.types import (Panel,Menu,Operator,PropertyGroup,)
 
 from . Test                 import Test_OPOperator
 from . UI_panel             import Add_Nodegroups,SimpleTools,UVTools
-from . Node_Tools           import Import_Hdri_node,Import_SSS_mat,Import_Texture_Maps,Choose_TexOperator,ReloadTex
+from . Node_Tools           import Import_Hdri_node,Import_SSS_mat,Import_Texture_Maps,Choose_TexOperator,ReloadTex,RelocateImageOperator
 from . View3D_Tools         import Collection_rename,LoopEdit,ParallelEdit,CleanNormalOperator
 from . UV_Tools             import EditUVchannelOperator
 from . My_PropertyGroup     import MyProperties
-from . Export_to_marmoset   import Export_To_Marmoset
+from . Export_to_marmoset   import Export_To_Marmoset_Bake,Export_To_Marmoset_Render
 
 
 classes = (
@@ -55,8 +55,10 @@ classes = (
     ParallelEdit,
     EditUVchannelOperator,
     Import_Texture_Maps,
-    Export_To_Marmoset,
+    Export_To_Marmoset_Bake,
+    Export_To_Marmoset_Render,
     ReloadTex,
+    RelocateImageOperator,
     Choose_TexOperator,
     CleanNormalOperator,
 )
