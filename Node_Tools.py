@@ -1,7 +1,7 @@
 '''
 Author: your name
 Date: 2020-10-04 22:32:46
-LastEditTime: 2021-05-17 16:54:11
+LastEditTime: 2021-05-21 15:02:49
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: \Addon\Import_Hdri.py
@@ -180,10 +180,6 @@ class Import_Texture_Maps(Operator):
 		SSS_Tex = SSS_DIF + SSS_ORM + SSS_NRM
 		SSSmatIP = ['DIF'] + ['ORM'] + ['NRM']
 		
-		# print(actmat_nameUP)
-		# print(list_file)
-		# print(TexNinMatNUP)
-		# print(",".join(TexNinMatNUP))
 
 		if actmat_nameUP in ",".join(TexNinMatNUP):
 			OPnode = bpy.data.materials[actmat_name].node_tree.nodes.active
@@ -258,3 +254,37 @@ class ReloadTex(bpy.types.Operator):
             i.reload()
         print('reload')
         return{'FINISHED'}
+
+class RelocateImageOperator(bpy.types.Operator):
+	bl_idname = "object.relocate_image"
+	bl_label = "Relocate Image"
+	
+	def execute(self, context):
+		selpath = []                                            #初始化贴图路径
+		context = bpy.context
+		scene = context.scene
+		selfTools = scene.self_Tools                            #调用全局propertygroup参数
+		selpath = selfTools.Tex_path                            #选中贴图路径
+
+		if selpath.endswith('\\'):                              #在blender搜索栏选择的路径后缀会自带一个'\'，这里检测后缀是否带'\'，检测到就自动删除，windows复制路径不存在这个问题。
+			selpath = selpath.rstrip('\\')
+
+		selobj = bpy.context.selected_objects
+		actobj = bpy.context.active_object
+		actmat = actobj.active_material
+		selnode = bpy.context.selected_nodes
+
+		for obj in selobj:
+			if obj.type == 'MESH':
+				for i in selnode:
+					if i.type == 'TEX_IMAGE':
+						img = actmat.node_tree.nodes[i.name].image
+						bpy.data.images[img.name].filepath = ''
+						refilepath = selpath + '\\' + img.name
+						bpy.data.images[img.name].filepath = refilepath
+						i.name = img.name
+						print(refilepath)
+
+				bpy.ops.image.reload()
+		
+		return {'FINISHED'}

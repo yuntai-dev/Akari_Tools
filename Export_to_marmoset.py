@@ -1,7 +1,7 @@
 '''
 Author: your name
 Date: 2021-04-16 13:49:32
-LastEditTime: 2021-04-20 19:04:45
+LastEditTime: 2021-05-20 13:41:49
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: \Test_addon\Export_to_marmoset.py
@@ -15,7 +15,7 @@ data = bpy.data
 context = bpy.context
 operator = bpy.types.Operator
 
-class Export_To_Marmoset(operator):
+class Export_To_Marmoset_Bake(operator):
     bl_idname = "export.marmoset"
     bl_label = "Export"
 
@@ -23,27 +23,27 @@ class Export_To_Marmoset(operator):
         scene = bpy.context.scene
         selfTools = scene.self_Tools                            #调用全局propertygroup参数
         selpath = selfTools.Ept_to_mar_path
-        ospath = Path(selpath+'Marmoset\\')
+        ospath = Path(selpath+'\\'+'Bake\\')
 
         selobj = context.selected_objects
         actobj = context.active_object
         actcoll = context.collection.name_full
-        credir = selpath+'Marmoset\\'
-
+        credir = selpath+'\\'+'Bake\\'
+        
         if ospath.is_dir() is False:
-            os.mkdir(selpath+'Marmoset\\')
+            os.mkdir(selpath+'\\'+'Bake\\')
             print('yes')
         else:
             print('no')
             
         bpy.ops.export_scene.fbx(filepath=credir+actcoll+'.fbx',use_selection=True,filter_glob='*.fbx')
+        return{'FINISHED'}
 
-        # if ospath.is_dir():
-        #     print('yes')
-        #     credir = selpath+'Marmoset\\'
-        # else:
-        #     credir = os.mkdir(selpath+'Marmoset\\')
+class Export_To_Marmoset_Render(bpy.types.Operator):
+    bl_idname = "object.export_to_marmoset_render"
+    bl_label = "Export_To_Marmoset_Render"
 
+    def execute(self, context):
 
         for i in selobj:
             actmat = bpy.data.objects[i.name_full].active_material

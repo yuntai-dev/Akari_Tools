@@ -1,7 +1,7 @@
 '''
 Author: your name
 Date: 2021-03-19 18:49:55
-LastEditTime: 2021-05-19 14:30:05
+LastEditTime: 2021-05-20 13:48:26
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: \Test_addon\view_tool.py
@@ -86,7 +86,7 @@ class ParallelEdit(bpy.types.Operator):
 
 class CleanNormalOperator(bpy.types.Operator):
     bl_idname = "object.cleannormal"
-    bl_label = "CleanNormal"
+    bl_label = "CleanMesh"
 
     def execute(self, context):        
         selection = bpy.context.selected_objects

@@ -1,7 +1,7 @@
 '''
 Author: your name
 Date: 2021-04-21 16:05:24
-LastEditTime: 2021-05-18 13:50:26
+LastEditTime: 2021-05-21 14:42:42
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: \Akari_Toolbag\Test.py
@@ -9,6 +9,7 @@ FilePath: \Akari_Toolbag\Test.py
 import bpy
 from mathutils import *
 import re
+import os
 
 D = bpy.data
 C = bpy.context
@@ -20,30 +21,30 @@ class Test_OPOperator(bpy.types.Operator):
 
 
     def execute(self, context):
+        selpath = []                                            #初始化贴图路径
+        context = bpy.context
+        scene = context.scene
+        selfTools = scene.self_Tools                            #调用全局propertygroup参数
+        selpath = selfTools.Tex_path                            #选中贴图路径
 
-        # my_str = "abc .abc .abc1-abc3"
-        # str = 'ab'
-        # strlen = len(str)
-        # my_list = ['t1','t2','t3','t4','t']
-        # old="abc"
-        # new = "xxx"
+        if selpath.endswith('\\'):                              #在blender搜索栏选择的路径后缀会自带一个'\'，这里检测后缀是否带'\'，检测到就自动删除，windows复制路径不存在这个问题。
+            selpath = selpath.rstrip('\\')
 
-        # result = re.sub("\\b" + old + "\\b", new, my_str)
-        # result3 = re.sub(r"\b%s\b" % (old), new, my_str)
-        # result2 = re.sub("\." + "\\b" + "abc" + "\\b", new, my_str)
-        # result1 = re.findall("\." + "\\b" + "abc" + "\\b",my_str)
+        selobj = bpy.context.selected_objects
+        actobj = bpy.context.active_object
+        actmat = actobj.active_material
+        selnode = bpy.context.selected_nodes
 
-        # test1 = re.search('3$',my_str)
-        # print(test1)
-        # print(type(test1))
+        for sel in selobj:
+            if sel.type == 'MESH':
 
-        # bpy.ops.object.empty_add(type='CUBE', align='WORLD', location=(0.0859147, -0.00213459, 0.139307), scale=(1, 1, 1))
-        print(cursor.location)
+                for i in selnode:
+                    img = actmat.node_tree.nodes[i.name].image
+                    bpy.data.images[img.name].filepath = ''
+                    refilepath = selpath + '\\' + img.name
+                    bpy.data.images[img.name].filepath = refilepath
+                    print(refilepath)
 
-        # put the location to the folder where the objs are located here in this fashion
-        #path_to_obj_dir = os.path.join('C:\\', 'Users', 'YOUR_NAME', 'Desktop', 'OBJS') #<-WINDOWS_OS
-        path_to_obj_dir = bpy.path.abspath('//OBJ/')
-
-
+                bpy.ops.image.reload()
 
         return {'FINISHED'}

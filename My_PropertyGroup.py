@@ -1,8 +1,8 @@
 '''
 Author: your name
 Date: 2021-04-19 12:05:27
-LastEditTime: 2021-04-19 18:19:48
-LastEditors: your name
+LastEditTime: 2021-05-20 12:43:11
+LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: \Test_addon\My_PropertyGroup.py
 '''
@@ -65,7 +65,7 @@ class MyProperties(PropertyGroup):
         subtype='DIR_PATH'
         )
     Ept_to_mar_path: StringProperty(
-        name = "marmosetpath",
+        name = "",
         description="Choose a directory:",
         default="",
         maxlen=1024,
