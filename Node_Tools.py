@@ -1,7 +1,7 @@
 '''
 Author: your name
 Date: 2020-10-04 22:32:46
-LastEditTime: 2021-05-21 15:02:49
+LastEditTime: 2021-05-27 11:12:26
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: \Addon\Import_Hdri.py
@@ -9,6 +9,7 @@ FilePath: \Addon\Import_Hdri.py
 import numpy as np
 import bpy
 import os
+import re
 import mathutils
 from bpy.props import (StringProperty,
                        BoolProperty,
@@ -161,9 +162,9 @@ class Import_Texture_Maps(Operator):
 		list_file = os.listdir(selpath)                         #路径中所有贴图list
 		list_fileUP = [i.upper() for i in list_file]
 		
-		DIF = 'DIF'
+		DIF = 'Dif'
 		ORM = 'ORM'
-		NRM = 'NRM'
+		NRM = 'Nrm'
 		
 		selobj_list = bpy.context.active_object                 #获取选中的模型
 		selobj_name = selobj_list.name_full                      #获取选中模型的名称
@@ -172,16 +173,17 @@ class Import_Texture_Maps(Operator):
 		actmat_nameUP = actmat_name.upper()
 		nodetree = bpy.data.materials[actmat_name].node_tree
 		
-		TexNinMatN = [M for M in list_fileUP if actmat_nameUP in M]         #筛选含有材质关键字的文件
+		TexNinMatN = [M for M in list_file if actmat_name in M]         #筛选含有材质关键字的文件
+		print(TexNinMatN)
 		TexNinMatNUP = [i.upper() for i in TexNinMatN]
-		SSS_DIF = [T for T in TexNinMatNUP if DIF in T]                   #筛选含有材质和贴图关键字的文件
-		SSS_ORM = [T for T in TexNinMatNUP if ORM in T]  
-		SSS_NRM = [T for T in TexNinMatNUP if NRM in T]
+		SSS_DIF = [T for T in TexNinMatN if DIF in T]                   #筛选含有材质和贴图关键字的文件
+		SSS_ORM = [T for T in TexNinMatN if ORM in T]  
+		SSS_NRM = [T for T in TexNinMatN if NRM in T]
 		SSS_Tex = SSS_DIF + SSS_ORM + SSS_NRM
 		SSSmatIP = ['DIF'] + ['ORM'] + ['NRM']
 		
 
-		if actmat_nameUP in ",".join(TexNinMatNUP):
+		if actmat_name in ",".join(TexNinMatN):
 			OPnode = bpy.data.materials[actmat_name].node_tree.nodes.active
 			OPnodeloc = OPnode.location
 			SSSnodelocoff = mathutils.Vector((-200.0, 0.0))
@@ -273,18 +275,19 @@ class RelocateImageOperator(bpy.types.Operator):
 		actobj = bpy.context.active_object
 		actmat = actobj.active_material
 		selnode = bpy.context.selected_nodes
+		osdirfile = os.listdir(selpath)
 
-		for obj in selobj:
-			if obj.type == 'MESH':
-				for i in selnode:
-					if i.type == 'TEX_IMAGE':
-						img = actmat.node_tree.nodes[i.name].image
-						bpy.data.images[img.name].filepath = ''
-						refilepath = selpath + '\\' + img.name
-						bpy.data.images[img.name].filepath = refilepath
-						i.name = img.name
-						print(refilepath)
+		for node in selnode:
+			actnodetex = bpy.data.materials[actmat.name].node_tree.nodes[node.name].image
+			for file in osdirfile:                                  						#用外部文件名称重命名节点名称和节点引用的贴图名称，以替代
+				if re.search(actnodetex.name.lower(), file.lower(), re.IGNORECASE):
+					img = actmat.node_tree.nodes[node.name].image
+					bpy.data.images[img.name].name = file
+					node.name = file
+					print(actnodetex.name)
+				else:
+					print('no')
 
-				bpy.ops.image.reload()
+		bpy.ops.image.reload()
 		
 		return {'FINISHED'}
