@@ -1,7 +1,7 @@
 '''
 Author: your name
 Date: 2020-10-01 17:47:39
-LastEditTime: 2021-05-21 15:06:06
+LastEditTime: 2021-05-27 15:33:34
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: \Addon\__init__.py
@@ -24,7 +24,7 @@ bl_info = {
     "author" : "Baka_Akari",
     "description" : "Akari Toolbag",
     "blender" : (2, 90, 0),
-    "version" : (0, 0, 1, 6),
+    "version" : (0, 0, 1, 7),
     "location" : "",
     "warning" : "Developing", 
 }

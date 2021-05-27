@@ -1,7 +1,7 @@
 '''
 Author: your name
 Date: 2021-04-21 16:05:24
-LastEditTime: 2021-05-21 18:25:31
+LastEditTime: 2021-05-27 15:33:10
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: \Akari_Toolbag\Test.py
@@ -99,36 +99,44 @@ class Test_OPOperator(bpy.types.Operator):
 
 
 
-        selpath = []                                            #初始化贴图路径
-        data = bpy.data
-        context = bpy.context
-        scene = context.scene
-        selfTools = scene.self_Tools                            #调用全局propertygroup参数
-        selpath = selfTools.Tex_path                            #选中贴图路径
-        list_file = os.listdir(selpath)                         #路径中所有贴图list
-        list_fileUP = [i.upper() for i in list_file]
+        # selpath = []                                            #初始化贴图路径
+        # data = bpy.data
+        # context = bpy.context
+        # scene = context.scene
+        # selfTools = scene.self_Tools                            #调用全局propertygroup参数
+        # selpath = selfTools.Tex_path                            #选中贴图路径
+        # list_file = os.listdir(selpath)                         #路径中所有贴图list
+        # list_fileUP = [i.upper() for i in list_file]
         
-        DIF = 'DIF'
-        ORM = 'ORM'
-        NRM = 'NRM'
+        # DIF = 'DIF'
+        # ORM = 'ORM'
+        # NRM = 'NRM'
         
-        selobj_list = bpy.context.active_object                 #获取选中的模型
-        selobj_name = selobj_list.name_full                      #获取选中模型的名称
-        actmat = bpy.data.objects[selobj_name].active_material   #获取选中模型的材质
-        actmat_name = actmat.name_full
-        actmat_nameUP = actmat_name.upper()
-        nodetree = bpy.data.materials[actmat_name].node_tree
+        # selobj_list = bpy.context.active_object                 #获取选中的模型
+        # selobj_name = selobj_list.name_full                      #获取选中模型的名称
+        # actmat = bpy.data.objects[selobj_name].active_material   #获取选中模型的材质
+        # actmat_name = actmat.name_full
+        # actmat_nameUP = actmat_name.upper()
+        # nodetree = bpy.data.materials[actmat_name].node_tree
         
-        TexNinMatN = [M for M in list_file if actmat_name in M]         #筛选含有材质关键字的文件
-        TexNinMatNUP = [i.upper() for i in TexNinMatN]
-        SSS_DIF = [T for T in TexNinMatN if DIF in T]                   #筛选含有材质和贴图关键字的文件
-        SSS_ORM = [T for T in TexNinMatN if ORM in T]  
-        SSS_NRM = [T for T in TexNinMatN if NRM in T]
-        SSS_Tex = SSS_DIF + SSS_ORM + SSS_NRM
-        SSSmatIP = ['DIF'] + ['ORM'] + ['NRM']
+        # TexNinMatN = [M for M in list_file if actmat_name in M]         #筛选含有材质关键字的文件
+        # TexNinMatNUP = [i.upper() for i in TexNinMatN]
+        # SSS_DIF = [T for T in TexNinMatN if DIF in T]                   #筛选含有材质和贴图关键字的文件
+        # SSS_ORM = [T for T in TexNinMatN if ORM in T]  
+        # SSS_NRM = [T for T in TexNinMatN if NRM in T]
+        # SSS_Tex = SSS_DIF + SSS_ORM + SSS_NRM
+        # SSSmatIP = ['DIF'] + ['ORM'] + ['NRM']
 
-        print(SSS_ORM)
+        # print(SSS_ORM)
 
+        actobj = bpy.context.active_object
+        actmat = actobj.active_material
+        selobj = bpy.context.selected_objects
+        actmat = actobj.active_material
+
+        for obj in selobj:
+            print(obj)
+            obj.active_material = actmat
 
 
 
