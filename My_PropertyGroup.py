@@ -1,10 +1,10 @@
 '''
 Author: your name
 Date: 2021-04-19 12:05:27
-LastEditTime: 2021-05-20 12:43:11
+LastEditTime: 2021-06-03 17:38:09
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
-FilePath: \Test_addon\My_PropertyGroup.py
+FilePath: \Akari_Tools\My_PropertyGroup.py
 '''
 import bpy
 from mathutils import *
@@ -21,6 +21,8 @@ from bpy.types import (Panel,
                        Operator,
                        PropertyGroup,
                        )
+                    
+
 D = bpy.data
 C = bpy.context
 
@@ -74,9 +76,27 @@ class MyProperties(PropertyGroup):
     my_enum: EnumProperty(
         name="Dropdown:",
         description="Apply Data to attribute.",
-        items=[ ('OP1', "Option 1", ""),
+        items=[ ('OP1', "Option 2", ""),
                 ('OP2', "Option 2", ""),
                 ('OP3', "Option 3", ""),
                ]
         )
-    my_test = 'test_test'
+
+    mat_enum = ()
+    OPlist = ['','','']
+    def mat_enumset(self):
+        OPlist = MyProperties.OPlist
+        Mat_enumtest = EnumProperty(
+                name="Dropdown:",
+                description="Apply Data to attribute.",
+                items=[ ('OP1', OPlist[0], ""),
+                        ('OP2', OPlist[1], ""),
+                        ('OP3', OPlist[2], ""),
+                    ]
+                )
+        MyProperties.Mat_enum = Mat_enumtest
+
+
+
+        
+

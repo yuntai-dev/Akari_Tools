@@ -1,10 +1,10 @@
 '''
 Author: your name
 Date: 2020-10-04 22:32:46
-LastEditTime: 2021-05-27 11:12:26
+LastEditTime: 2021-06-02 17:34:56
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
-FilePath: \Addon\Import_Hdri.py
+FilePath: \Akari_Tools\Import_Hdri.py
 '''
 import numpy as np
 import bpy
@@ -174,14 +174,12 @@ class Import_Texture_Maps(Operator):
 		nodetree = bpy.data.materials[actmat_name].node_tree
 		
 		TexNinMatN = [M for M in list_file if actmat_name in M]         #筛选含有材质关键字的文件
-		print(TexNinMatN)
 		TexNinMatNUP = [i.upper() for i in TexNinMatN]
 		SSS_DIF = [T for T in TexNinMatN if DIF in T]                   #筛选含有材质和贴图关键字的文件
 		SSS_ORM = [T for T in TexNinMatN if ORM in T]  
 		SSS_NRM = [T for T in TexNinMatN if NRM in T]
 		SSS_Tex = SSS_DIF + SSS_ORM + SSS_NRM
-		SSSmatIP = ['DIF'] + ['ORM'] + ['NRM']
-		
+		SSSmatIP = [DIF] + [ORM] + [NRM]
 
 		if actmat_name in ",".join(TexNinMatN):
 			OPnode = bpy.data.materials[actmat_name].node_tree.nodes.active
@@ -208,20 +206,20 @@ class Import_Texture_Maps(Operator):
 			SSSNorI.default_value = (1)
 			
 			nodetree.links.new(SSSnode.outputs[0], OPnode.inputs[0])
-			
+
 			Texmap = {SSS_Tex[0]:SSSmatIP[0],SSS_Tex[1]:SSSmatIP[1],SSS_Tex[2]:SSSmatIP[2]}
+			SSSmatin = 0,3,6
 			Downlocoff = mathutils.Vector((0.0, -300.0))
 			
 			for i in range(0, len(SSS_Tex)):
 				Tex = SSS_Tex[i]
-				print('Tex:',Tex)
 				SpStr = str(Tex.split('_'))
-				print(SpStr)
 				
 				bpy.ops.image.open(filepath=selpath+Tex, directory=selpath, files=[{"name":Tex, "name":Tex}], relative_path=True, show_multiview=False)        #根据路径和筛选条件导入指定路径下的贴图文件
 				Texture = bpy.data.images[Tex]                                                      #遍历获取DIF图像
+				print(i)
 				
-				if Texmap[SSS_Tex[i]] == 'DIF':                                                 #判断图像关键字类型，ORM和NRM色彩空间设定为non-color
+				if Texmap[SSS_Tex[i]] == DIF:                                                 #判断图像关键字类型，ORM和NRM色彩空间设定为non-color
 					Texture.colorspace_settings.name = 'sRGB'
 				else:
 					Texture.colorspace_settings.name = 'Non-Color'
@@ -240,7 +238,7 @@ class Import_Texture_Maps(Operator):
 					NRMloc = ORMloc + Downlocoff
 					Texnode.location = NRMloc                     #节点依父节点偏移
 					
-				nodetree.links.new(Texnode.outputs[0], SSSnode.inputs[Texmap[Tex]])
+				nodetree.links.new(Texnode.outputs[0], SSSnode.inputs[SSSmatin[i]])
 		
 		else:
 			print('non')

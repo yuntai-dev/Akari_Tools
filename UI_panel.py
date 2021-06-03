@@ -1,13 +1,13 @@
 '''
 Author: your name
 Date: 2020-10-05 00:06:21
-LastEditTime: 2021-05-21 14:24:36
+LastEditTime: 2021-06-03 11:30:58
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
-FilePath: \Addon\panel.py
+FilePath: \Akari_Tools\panel.py
 '''
 import bpy
-from . AddonPropertyGroup   import MyProperties
+from . My_PropertyGroup   import MyProperties
 # from . Import_Operator       import Import_Texture_Maps
 
 #####draw panel#####
@@ -44,7 +44,10 @@ class Add_Nodegroups(bpy.types.Panel):
 
         box = layout.box()
         box.label(text='NodeTest Button')
+        box.prop(selfTools,'Mat_enum')
         box.operator('object.test_op')
+        box.operator('object.test_op2')
+        box.operator('utils.globle')
 
 class SimpleTools(bpy.types.Panel):
     bl_idname = "SSS_Simple_Tools"

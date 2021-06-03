@@ -1,10 +1,10 @@
 '''
 Author: your name
 Date: 2020-10-01 17:47:39
-LastEditTime: 2021-05-27 15:33:34
+LastEditTime: 2021-06-03 14:25:49
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
-FilePath: \Addon\__init__.py
+FilePath: \Akari_Tools\__init__.py
 '''
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -33,7 +33,8 @@ import bpy
 from bpy.props import (StringProperty,BoolProperty,IntProperty,FloatProperty,FloatVectorProperty,EnumProperty,PointerProperty,)
 from bpy.types import (Panel,Menu,Operator,PropertyGroup,)
 
-from . Test                 import Test_OPOperator
+from . Test                 import Test_OPOperator,Test_OP2Operator
+from . utils                import globle_utils
 from . UI_panel             import Add_Nodegroups,SimpleTools,UVTools
 from . Node_Tools           import Import_Hdri_node,Import_SSS_mat,Import_Texture_Maps,Choose_TexOperator,ReloadTex,RelocateImageOperator
 from . View3D_Tools         import Collection_rename,LoopEdit,ParallelEdit,CleanNormalOperator
@@ -44,6 +45,8 @@ from . Export_to_marmoset   import Export_To_Marmoset_Bake,Export_To_Marmoset_Re
 
 classes = (
     Test_OPOperator,
+    Test_OP2Operator,
+    globle_utils,
     Add_Nodegroups,
     SimpleTools,
     UVTools,
@@ -71,8 +74,7 @@ def register():
     for cls in classes:
         register_class(cls)
     bpy.types.Scene.self_Tools = PointerProperty(type=MyProperties)
-    
-    # bpy.ops.script.reload()
+
     # bpy.ops.script.reload()
     # choosekeymap = []
 
