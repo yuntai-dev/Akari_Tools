@@ -1,102 +1,64 @@
-'''
-Author: your name
-Date: 2020-10-01 17:47:39
-LastEditTime: 2021-06-03 14:25:49
-LastEditors: Please set LastEditors
-Description: In User Settings Edit
-FilePath: \Akari_Tools\__init__.py
-'''
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTIBILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-# General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program. If not, see <http://www.gnu.org/licenses/>.
-
 bl_info = {
-    "name" : "Akari Toolbag",
-    "author" : "Baka_Akari",
-    "description" : "Akari Toolbag",
-    "blender" : (2, 90, 0),
-    "version" : (0, 0, 1, 7),
+    "name" : "Akari_Tools_re",
+    "author" : "Akari",
+    "description" : "",
+    "blender" : (2, 80, 0),
+    "version" : (0, 0, 1),
     "location" : "",
-    "warning" : "Developing", 
+    "warning" : "Test",
+    "category" : ""
 }
-
 import bpy
-from bpy.props import (StringProperty,BoolProperty,IntProperty,FloatProperty,FloatVectorProperty,EnumProperty,PointerProperty,)
-from bpy.types import (Panel,Menu,Operator,PropertyGroup,)
+from bpy.props import (StringProperty,
+                       BoolProperty,
+                       IntProperty,
+                       FloatProperty,
+                       FloatVectorProperty,
+                       EnumProperty,
+                       PointerProperty,
+                       )
+from bpy.types import (Panel,
+                       Menu,
+                       Operator,
+                       PropertyGroup, 
+                       ShaderNodeLightFalloff,
+                       Context,
+                       Scene,
+                       )
 
-from . Test                 import Test_OPOperator,Test_OP2Operator
-from . utils                import globle_utils
-from . UI_panel             import Add_Nodegroups,SimpleTools,UVTools
-from . Node_Tools           import Import_Hdri_node,Import_SSS_mat,Import_Texture_Maps,Choose_TexOperator,ReloadTex,RelocateImageOperator
-from . View3D_Tools         import Collection_rename,LoopEdit,ParallelEdit,CleanNormalOperator
-from . UV_Tools             import EditUVchannelOperator
-from . My_PropertyGroup     import MyProperties
-from . Export_to_marmoset   import Export_To_Marmoset_Bake,Export_To_Marmoset_Render
+from . CleanMesh import CleanMeshPanel,CleanMeshOperator
+from . BatchRename  import BatchRenamePanel,BatchRenameOperator
+from . AddNode  import AddNodePanel,ImportBaseMatOperator,ImportHDRImatOperator,ImportImageOperator,ReloadImageOperator
+from . SwichMaterial    import SwitchMaterialPanel,SwitchMaterialOperator,RenameOutputMaterialOperator,outputmatlist
+from . AddonProps   import addonpropgroup
 
-
-classes = (
-    Test_OPOperator,
-    Test_OP2Operator,
-    globle_utils,
-    Add_Nodegroups,
-    SimpleTools,
-    UVTools,
-    MyProperties,
-    Import_Hdri_node,
-    Import_SSS_mat,
-    Collection_rename,
-    LoopEdit,
-    ParallelEdit,
-    EditUVchannelOperator,
-    Import_Texture_Maps,
-    Export_To_Marmoset_Bake,
-    Export_To_Marmoset_Render,
-    ReloadTex,
-    RelocateImageOperator,
-    Choose_TexOperator,
-    CleanNormalOperator,
-)
-print('test')
+classes = (addonpropgroup,
+            CleanMeshPanel,
+            CleanMeshOperator,
+            BatchRenamePanel,
+            BatchRenameOperator,
+            AddNodePanel,
+            ImportBaseMatOperator,
+            ImportHDRImatOperator,
+            ImportImageOperator,
+            ReloadImageOperator,
+            SwitchMaterialPanel,
+            SwitchMaterialOperator,
+            RenameOutputMaterialOperator,
+            )
 
 def register():
-    print('register')
     from bpy.utils import register_class
-
     for cls in classes:
         register_class(cls)
-    bpy.types.Scene.self_Tools = PointerProperty(type=MyProperties)
-
-    # bpy.ops.script.reload()
-    # choosekeymap = []
-
+    bpy.types.Scene.addonprops = PointerProperty(type=addonpropgroup)
 
 
 def unregister():
-    print('unregister')
     from bpy.utils import unregister_class
     for cls in classes:
         unregister_class(cls)
-    del bpy.types.Scene.self_Tools
+    del bpy.types.Scene.addonprops
 
-    cho = Choose_TexOperator.cho
-    choi = Choose_TexOperator.choi
-    choosekeymap = Choose_TexOperator.choosekeymap
-
-    for cho,choi in choosekeymap:
-        cho.keymap_items.remove(choi)
-    choosekeymap.clear()
-
-
-
-
-
-    
+if __name__ == "__main__":
+    register()
