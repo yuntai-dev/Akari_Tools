@@ -1,6 +1,6 @@
 import bpy
 from bpy import props
-from bpy.types import Scene
+from bpy.types import Object, Scene
 from mathutils import *
 
 def outputmatlist(self,context):
@@ -9,16 +9,22 @@ def outputmatlist(self,context):
     actobj = bpy.context.active_object
     actmat = actobj.active_material
 
-    actnodetree = bpy.data.materials[actmat.name].node_tree.nodes
-    for i in list(actnodetree):
-        if i.type == 'OUTPUT_MATERIAL':
-            outmatlist.append(i)
-    return [(i.name, i.name, "") for i in outmatlist]
+    if type(actobj) == Object:
+        if len(actobj.material_slots) > 0:
+            actnodetree = bpy.data.materials[actmat.name].node_tree.nodes
+            for i in list(actnodetree):
+                if i.type == 'OUTPUT_MATERIAL':
+                    outmatlist.append(i)
+            return [(i.name, i.name, "") for i in outmatlist]
+        else:
+            return
+    else:
+        return
 
 class SwitchMaterialPanel(bpy.types.Panel):
-    bl_idname = "SwitchMaterial"
+    bl_idname = "OBJECT_PT_SwitchMaterial"
     bl_label = "Switch Material"
-    bl_category = "Test"
+    bl_category = "NodeTools"
     bl_space_type = "NODE_EDITOR"
     bl_region_type = "UI"
 
@@ -30,7 +36,7 @@ class SwitchMaterialPanel(bpy.types.Panel):
         layout.operator('object.renameoutputmaterial')
         layout.prop(addonprops,'OMlist')
         layout.operator('object.switchmaterial')
-        return super().draw(context)
+        return 
 
 
 class RenameOutputMaterialOperator(bpy.types.Operator):

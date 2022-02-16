@@ -17,9 +17,9 @@ from bpy.types import (Panel,
                        )
 
 class AddNodePanel(bpy.types.Panel):
-    bl_idname = "AddNode"
+    bl_idname = "OBJECT_PT_AddNode"
     bl_label = "Add Node"
-    bl_category = "Test"
+    bl_category = "NodeTools"
     bl_space_type = "NODE_EDITOR"
     bl_region_type = "UI"
 
@@ -32,7 +32,7 @@ class AddNodePanel(bpy.types.Panel):
         layout.prop(addonprops,'addimage_path')
         layout.operator('object.importimage')
         layout.operator('object.reloadimage')
-        return super().draw(context)
+        return 
 
 
 class ImportBaseMatOperator(bpy.types.Operator):
@@ -142,21 +142,18 @@ class ImportImageOperator(bpy.types.Operator):
         scene = context.scene
         selpath = scene.addonprops.addimage_path                            #选中贴图路径
         list_file = os.listdir(selpath)                         #路径中所有贴图list
-        list_fileUP = [i.upper() for i in list_file]
 
-        DIF = 'Dif'
+        DIF = 'DIF'
         ORM = 'ORM'
-        NRM = 'Nrm'
+        NRM = 'NRM'
 
         selobj_list = bpy.context.active_object                 #获取选中的模型
         selobj_name = selobj_list.name_full                      #获取选中模型的名称
         actmat = bpy.data.objects[selobj_name].active_material   #获取选中模型的材质
         actmat_name = actmat.name_full
-        actmat_nameUP = actmat_name.upper()
         nodetree = bpy.data.materials[actmat_name].node_tree
 
         TexNinMatN = [M for M in list_file if actmat_name in M]         #筛选含有材质关键字的文件
-        TexNinMatNUP = [i.upper() for i in TexNinMatN]
         SSS_DIF = [T for T in TexNinMatN if DIF in T]                   #筛选含有材质和贴图关键字的文件
         SSS_ORM = [T for T in TexNinMatN if ORM in T]  
         SSS_NRM = [T for T in TexNinMatN if NRM in T]
