@@ -1,3 +1,4 @@
+from posixpath import split
 import bpy
 from bpy import context
 import mathutils 
@@ -18,8 +19,8 @@ from bpy.types import (Panel,
 
 class AddNodePanel(bpy.types.Panel):
     bl_idname = "OBJECT_PT_AddNode"
-    bl_label = "Add Node"
-    bl_category = "NodeTools"
+    bl_label = "Node Tools"
+    bl_category = "Tool"
     bl_space_type = "NODE_EDITOR"
     bl_region_type = "UI"
 
@@ -27,11 +28,11 @@ class AddNodePanel(bpy.types.Panel):
         addonprops = context.scene.addonprops
         layout = self.layout
         row = layout.row()
-        row.operator('object.importbasemat')
-        row.operator('object.importhdrimat')
+        # row.operator('object.importbasemat')
+        # row.operator('object.importhdrimat')
         layout.prop(addonprops,'addimage_path')
         layout.operator('object.importimage')
-        layout.operator('object.reloadimage')
+        layout.operator('object.acestextool')
         return 
 
 
@@ -224,13 +225,32 @@ class ImportImageOperator(bpy.types.Operator):
 
         return {'FINISHED'}
 
-class ReloadImageOperator(bpy.types.Operator):
-    bl_idname = "object.reloadimage"
-    bl_label = "Reload Image"
+
+class ACESTexToolOperator(bpy.types.Operator):
+    bl_idname = "object.acestextool"
+    bl_label = "ACES SRGB色彩空间切换"
 
     def execute(self, context):
-        texlist = list(bpy.data.images)
-        for i in texlist:
-            i.reload()
-        print('reload')
+        ColType = ['albedo','c','color','diffuse','base color','col']
+        HDRType = ['hdr','exr']
+        device = bpy.data.scenes['Scene'].display_settings.display_device
+        images = bpy.data.images
+        for i in images:
+            sptype = i.name.split('.')
+            if sptype[-1] in HDRType:   #后缀为hdr和exr的hdri图像文件，色彩空间设置为ACES线性
+                if device == 'sRGB':
+                    i.colorspace_settings.name = 'Linear'
+                elif device == 'ACES':
+                    i.colorspace_settings.name = 'Utility - Linear - sRGB'
+
+            else:
+                spname = sptype[0].split('_')
+                for col in spname:
+                    col = col.lower()
+                    if col in ColType:
+                        if device == 'sRGB':
+                            i.colorspace_settings.name = 'sRGB'
+                        elif device == 'ACES':
+                            i.colorspace_settings.name = 'Utility - sRGB - Texture'
+
         return {'FINISHED'}

@@ -3,42 +3,127 @@ bl_info = {
     "author" : "Akari",
     "description" : "",
     "blender" : (2, 93, 0),
-    "version" : (0, 0, 3),
+    "version" : (0, 0, 4),
     "location" : "",
     "warning" : "",
     "category" : ""
 }
 import bpy
-from bpy.props import (StringProperty,
-                       BoolProperty,
-                       IntProperty,
-                       FloatProperty,
-                       FloatVectorProperty,
-                       EnumProperty,
-                       PointerProperty,
-                       )
-from bpy.types import (Panel,
-                       Menu,
-                       Operator,
-                       PropertyGroup, 
-                       ShaderNodeLightFalloff,
-                       Context,
-                       Scene,
-                       )
+import traceback
+from bpy.props import (PointerProperty)
+from . import addon_updater_ops
 
 from . AddonProps   import addonpropgroup
-from . AddonPreferences import AkaritoolsPreferences
 from . CleanMesh import ToolsPanel,CleanMeshOperator,BatchRenameOperator,BatchSetOriginOperator
-from . AddNode  import AddNodePanel,ImportBaseMatOperator,ImportHDRImatOperator,ImportImageOperator,ReloadImageOperator
-from . SwichMaterial    import SwitchMaterialPanel,SwitchMaterialOperator,RenameOutputMaterialOperator,outputmatlist
+from . AddNode  import AddNodePanel,ImportBaseMatOperator,ImportHDRImatOperator,ImportImageOperator,ACESTexToolOperator
 from . QuickPhysics    import PhysicsPanel,ASSET_SKETCHER_OT_CalcPhysics,ASSET_SKETCHER_OT_AddActivePhysics,ASSET_SKETCHER_OT_ApplyPhysics
 from . BakeVertexAO    import BakeVertexAOPanel,BakeVertexAOOperator,AOChangeChannelOperator
-from . GoH  import GoHPanel,GoHOperator
-from . SetingSync   import SettingSyncPanel,SettingSyncOPOperator
-from . SelectCollObj    import OBJECT_OT_CustomOp
 
-classes = (addonpropgroup,
-            AkaritoolsPreferences,
+
+
+class DemoUpdaterPanel(bpy.types.Panel):
+	"""Panel to demo popup notice and ignoring functionality"""
+	bl_label = "Updater Demo Panel"
+	bl_idname = "OBJECT_PT_DemoUpdaterPanel_hello"
+	bl_space_type = 'VIEW_3D'
+	bl_region_type = 'TOOLS' if bpy.app.version < (2, 80) else 'UI'
+	bl_context = "objectmode"
+	bl_category = "Tools"
+
+	def draw(self, context):
+		layout = self.layout
+
+		# Call to check for update in background.
+		# Note: built-in checks ensure it runs at most once, and will run in
+		# the background thread, not blocking or hanging blender.
+		# Internally also checks to see if auto-check enabled and if the time
+		# interval has passed.
+		addon_updater_ops.check_for_update_background()
+
+		layout.label(text="Demo Updater Addon")
+		layout.label(text="")
+
+		col = layout.column()
+		col.scale_y = 0.7
+		col.label(text="If an update is ready,")
+		col.label(text="popup triggered by opening")
+		col.label(text="this panel, plus a box ui")
+
+		# Could also use your own custom drawing based on shared variables.
+		if addon_updater_ops.updater.update_ready:
+			layout.label(text="Custom update message", icon="INFO")
+		layout.label(text="")
+
+		# Call built-in function with draw code/checks.
+		addon_updater_ops.update_notice_box_ui(self, context)
+
+
+@addon_updater_ops.make_annotations
+class DemoPreferences(bpy.types.AddonPreferences):
+	"""Demo bare-bones preferences"""
+	bl_idname = __package__
+
+	# Addon updater preferences.
+
+	auto_check_update = bpy.props.BoolProperty(
+		name="Auto-check for Update",
+		description="If enabled, auto-check for updates using an interval",
+		default=False)
+
+	updater_interval_months = bpy.props.IntProperty(
+		name='Months',
+		description="Number of months between checking for updates",
+		default=0,
+		min=0)
+
+	updater_interval_days = bpy.props.IntProperty(
+		name='Days',
+		description="Number of days between checking for updates",
+		default=7,
+		min=0,
+		max=31)
+
+	updater_interval_hours = bpy.props.IntProperty(
+		name='Hours',
+		description="Number of hours between checking for updates",
+		default=0,
+		min=0,
+		max=23)
+
+	updater_interval_minutes = bpy.props.IntProperty(
+		name='Minutes',
+		description="Number of minutes between checking for updates",
+		default=0,
+		min=0,
+		max=59)
+
+	def draw(self, context):
+		layout = self.layout
+
+		# Works best if a column, or even just self.layout.
+		mainrow = layout.row()
+		col = mainrow.column()
+
+		# Updater draw function, could also pass in col as third arg.
+		addon_updater_ops.update_settings_ui(self, context)
+
+		# Alternate draw function, which is more condensed and can be
+		# placed within an existing draw function. Only contains:
+		#   1) check for update/update now buttons
+		#   2) toggle for auto-check (interval will be equal to what is set above)
+		# addon_updater_ops.update_settings_ui_condensed(self, context, col)
+
+		# Adding another column to help show the above condensed ui as one column
+		# col = mainrow.column()
+		# col.scale_y = 2
+		# ops = col.operator("wm.url_open","Open webpage ")
+		# ops.url=addon_updater_ops.updater.website
+
+
+classes = (
+			DemoPreferences,
+			DemoUpdaterPanel,
+			addonpropgroup,
             ToolsPanel,
             CleanMeshOperator,
             BatchRenameOperator,
@@ -47,10 +132,7 @@ classes = (addonpropgroup,
             ImportBaseMatOperator,
             ImportHDRImatOperator,
             ImportImageOperator,
-            ReloadImageOperator,
-            SwitchMaterialPanel,
-            SwitchMaterialOperator,
-            RenameOutputMaterialOperator,
+            ACESTexToolOperator,
             PhysicsPanel,
             ASSET_SKETCHER_OT_CalcPhysics,
             ASSET_SKETCHER_OT_AddActivePhysics,
@@ -58,41 +140,26 @@ classes = (addonpropgroup,
             BakeVertexAOPanel,
             BakeVertexAOOperator,
             AOChangeChannelOperator,
-            GoHPanel,
-            GoHOperator,
-            SettingSyncPanel,
-            SettingSyncOPOperator,
-            OBJECT_OT_CustomOp,
             )
 
-addon_keymaps = []
-
 def register():
-    from bpy.utils import register_class
-    for cls in classes:
-        register_class(cls)
-    bpy.types.Scene.addonprops = PointerProperty(type=addonpropgroup)
-    bpy.types.WindowManager.asset_sketcher = PointerProperty(type=addonpropgroup)
-
-    wm = bpy.context.window_manager
-    kc = wm.keyconfigs.addon
-    if kc:
-        km = wm.keyconfigs.addon.keymaps.new(name='3D View', space_type='VIEW_3D')
-        kmi = km.keymap_items.new(OBJECT_OT_CustomOp.bl_idname, type='W', value='PRESS', ctrl=True)
-        addon_keymaps.append((km, kmi))
+	addon_updater_ops.register(bl_info)
+	from bpy.utils import register_class
+	for cls in classes:
+		addon_updater_ops.make_annotations(cls)
+		register_class(cls)
+	bpy.types.Scene.addonprops = PointerProperty(type=addonpropgroup)
+	bpy.types.WindowManager.asset_sketcher = PointerProperty(type=addonpropgroup)
 
 
 
 def unregister():
-    from bpy.utils import unregister_class
-    for cls in classes:
-        unregister_class(cls)
-    del bpy.types.Scene.addonprops
-    del bpy.types.WindowManager.asset_sketcher
-    
-    for km, kmi in addon_keymaps:
-        km.keymap_items.remove(kmi)
-    addon_keymaps.clear()
+	addon_updater_ops.unregister()
+	from bpy.utils import unregister_class
+	for cls in classes:
+		unregister_class(cls)
+	del bpy.types.Scene.addonprops
+	del bpy.types.WindowManager.asset_sketcher
 
 if __name__ == "__main__":
     register()

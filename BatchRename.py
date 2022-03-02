@@ -6,7 +6,7 @@ C = bpy.context
 class BatchRenamePanel(bpy.types.Panel):
     bl_idname = "BatchRename"
     bl_label = "Batch Rename"
-    bl_category = "Akari"
+    bl_category = "Tool"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
 

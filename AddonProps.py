@@ -15,7 +15,6 @@ from bpy.types import (Panel,
                        Context,
                        Scene,
                        )
-from . SwichMaterial    import outputmatlist
 
 class addonpropgroup(PropertyGroup):
     addimage_path: StringProperty(
@@ -34,10 +33,10 @@ class addonpropgroup(PropertyGroup):
         subtype='FILE_NAME'
         )
                                     
-    OMlist: EnumProperty(
-        name='test',
-        description='testdes',
-        items=outputmatlist)
+    # OMlist: EnumProperty(
+    #     name='test',
+    #     description='testdes',
+    #     items=outputmatlist)
 
     ### physics box
     box_physics: BoolProperty(description="Show/Hide Physics Box", default=True)

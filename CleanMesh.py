@@ -6,7 +6,7 @@ C = bpy.context
 class ToolsPanel(bpy.types.Panel):
     bl_idname = "OBJECT_PT_3DTools"
     bl_label = "3D Tools"
-    bl_category = "Akari"
+    bl_category = "Tool"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     

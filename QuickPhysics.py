@@ -5,7 +5,7 @@ from mathutils import Matrix
 class PhysicsPanel(bpy.types.Panel):
     bl_idname = "OBJECT_PT_PhysicsPanel"
     bl_label = "快速刚体碰撞"
-    bl_category = "Akari"
+    bl_category = "Tool"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
 

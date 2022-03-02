@@ -5,7 +5,7 @@ import math
 class BakeVertexAOPanel(bpy.types.Panel):
     bl_idname = "OBJECT_PT_Bake_Vertex_AO"
     bl_label = "烘焙顶点色AO"
-    bl_category = "Akari"
+    bl_category = "Tool"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
 
