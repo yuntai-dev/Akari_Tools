@@ -3,7 +3,7 @@ bl_info = {
     "author" : "Akari",
     "description" : "",
     "blender" : (2, 93, 0),
-    "version" : (0, 0, 4),
+    "version" : (0, 0, 5),
     "location" : "",
     "warning" : "",
     "category" : ""
