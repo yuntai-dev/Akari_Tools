@@ -1353,16 +1353,16 @@ def register(bl_info):
     updater.private_token = None  # "tokenstring"
 
     # Choose your own username, must match website (not needed for GitLab).
-    updater.user = "cgcookie"
+    updater.user = "BakaAkari"
 
     # Choose your own repository, must match git name for GitHUb and Bitbucket,
     # for GitLab use project ID (numbers only).
-    updater.repo = "blender-addon-updater"
+    updater.repo = "Akari_Tools"
 
     # updater.addon = # define at top of module, MUST be done first
 
     # Website for manual addon download, optional but recommended to set.
-    updater.website = "https://github.com/CGCookie/blender-addon-updater/"
+    updater.website = "https://github.com/yuntai-dev/Akari_Tools"
 
     # Addon subfolder path.
     # "sample/path/to/addon"
