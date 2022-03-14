@@ -1,4 +1,5 @@
 import bpy
+from bpy.utils import register_class, unregister_class
 from mathutils import *
 D = bpy.data
 C = bpy.context
@@ -6,9 +7,11 @@ C = bpy.context
 class ToolsPanel(bpy.types.Panel):
     bl_idname = "OBJECT_PT_3DTools"
     bl_label = "3D Tools"
-    bl_category = "Tool"
+    bl_category = "Edit"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
+    bl_order = 10
+    bl_options = {'DEFAULT_CLOSED'}
     
     def draw(self, context):
         layout = self.layout
@@ -75,3 +78,19 @@ class BatchSetOriginOperator(bpy.types.Operator):
             print(bpy.data.objects[i.name_full].dimensions.z)
             # bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY')
         return{'FINISHED'}
+
+classes = (ToolsPanel,
+            CleanMeshOperator,
+            BatchRenameOperator,
+            BatchSetOriginOperator
+            )
+
+def register():
+    global classes
+    for cls in classes:
+        register_class(cls)
+
+def unregister():
+    global classes
+    for cls in classes:
+        unregister_class(cls)

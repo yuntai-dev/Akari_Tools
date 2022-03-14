@@ -1,5 +1,6 @@
 from posixpath import split
 import bpy
+from bpy.utils import register_class, unregister_class
 from bpy import context
 import mathutils 
 import os
@@ -32,8 +33,26 @@ class AddNodePanel(bpy.types.Panel):
         # row.operator('object.importhdrimat')
         layout.prop(addonprops,'addimage_path')
         layout.operator('object.importimage')
-        layout.operator('object.acestextool')
+        layout.operator('object.texcolorspace')
         return 
+
+class ACES_PT_Panel(bpy.types.Panel):
+    bl_label = "ACES工具"
+    bl_space_type = 'PROPERTIES'
+    bl_region_type = 'WINDOW'
+    bl_context = "render" 
+    bl_order = 200
+    bl_options = {'DEFAULT_CLOSED'}
+
+    def draw(self,context):
+        layout = self.layout
+        scene = context.scene
+        view = scene.view_settings
+
+        flow = layout.grid_flow(row_major=True, columns=0, even_columns=False, even_rows=False, align=True)
+
+        col = flow.column()
+        col.operator('object.acestextool')
 
 
 class ImportBaseMatOperator(bpy.types.Operator):
@@ -254,3 +273,45 @@ class ACESTexToolOperator(bpy.types.Operator):
                             i.colorspace_settings.name = 'Utility - sRGB - Texture'
 
         return {'FINISHED'}
+
+
+
+class TexColorSpaceOperator(bpy.types.Operator):
+    bl_idname = "object.texcolorspace"
+    bl_label = "图像色彩空间矫正"
+
+    def execute(self, context):
+        texs = bpy.data.images
+        for t in texs:
+            tname = t.name.split('_')
+            # for tn in tname:
+            if "C" in tname[-1]:
+                t.colorspace_settings.name = "sRGB"
+            if "M" in tname[-1]:
+                t.colorspace_settings.name = "Non-Color"
+            if "N" in tname[-1]:
+                t.colorspace_settings.name = "Non-Color"
+        return {'FINISHED'}
+
+
+
+
+
+
+classes = (AddNodePanel,
+            ACES_PT_Panel,
+            ImportBaseMatOperator,
+            ImportHDRImatOperator,
+            ImportImageOperator,
+            ACESTexToolOperator,
+            TexColorSpaceOperator)
+
+def register():
+    global classes
+    for cls in classes:
+        register_class(cls)
+
+def unregister():
+    global classes
+    for cls in classes:
+        unregister_class(cls)

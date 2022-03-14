@@ -1,13 +1,17 @@
 import bpy
 import re
 import math
+from bpy.utils import register_class, unregister_class
+
 
 class BakeVertexAOPanel(bpy.types.Panel):
     bl_idname = "OBJECT_PT_Bake_Vertex_AO"
     bl_label = "烘焙顶点色AO"
-    bl_category = "Tool"
+    bl_category = "Edit"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
+    bl_order = 12
+    bl_options = {'DEFAULT_CLOSED'}
 
     def draw(self, context):
         layout = self.layout
@@ -134,3 +138,17 @@ class AOChangeChannelOperator(bpy.types.Operator):
             #         vtxcol.data[i.index].color[2] = 0
             #         vtxcol.data[i.index].color[3] = 1
         return{'FINISHED'}
+
+classes = (BakeVertexAOPanel,
+            BakeVertexAOOperator,
+            AOChangeChannelOperator)
+
+def register():
+    global classes
+    for cls in classes:
+        register_class(cls)
+
+def unregister():
+    global classes
+    for cls in classes:
+        unregister_class(cls)

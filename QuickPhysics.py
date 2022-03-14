@@ -1,13 +1,16 @@
 import bpy
+from bpy.utils import register_class, unregister_class
 from mathutils import Matrix
 
 
 class PhysicsPanel(bpy.types.Panel):
     bl_idname = "OBJECT_PT_PhysicsPanel"
     bl_label = "快速刚体碰撞"
-    bl_category = "Tool"
+    bl_category = "Edit"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
+    bl_order = 11
+    bl_options = {'DEFAULT_CLOSED'}
 
     def draw(self, context):
         wm = context.window_manager
@@ -23,7 +26,7 @@ class PhysicsPanel(bpy.types.Panel):
 
 
 
-class ASSET_SKETCHER_OT_CalcPhysics(bpy.types.Operator):
+class AkariPhysics_OT_CalcPhysics(bpy.types.Operator):
     bl_idname = "asset_sketcher.calc_physics"
     bl_label = "Calculate Physics"
     bl_description = ""
@@ -133,7 +136,7 @@ class ASSET_SKETCHER_OT_CalcPhysics(bpy.types.Operator):
         return {"PASS_THROUGH"}
 
 
-class ASSET_SKETCHER_OT_AddActivePhysics(bpy.types.Operator):
+class AkariPhysics_OT_AddActivePhysics(bpy.types.Operator):
     bl_idname = "object.as_add_active_physics"
     bl_label = "Add physics to Assets"
     bl_description = "Sets up Assets as rigidbody objects."
@@ -151,7 +154,7 @@ class ASSET_SKETCHER_OT_AddActivePhysics(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class ASSET_SKETCHER_OT_ApplyPhysics(bpy.types.Operator):
+class AkariPhysics_OT_ApplyPhysics(bpy.types.Operator):
     bl_idname = "object.as_apply_physics"
     bl_label = "Apply physics to Assets"
     bl_description = "Applies physics to assets and removes rigidbodies."
@@ -177,3 +180,19 @@ class ASSET_SKETCHER_OT_ApplyPhysics(bpy.types.Operator):
         context.view_layer.objects.active = active_object
 
         return {'FINISHED'}
+
+classes = (PhysicsPanel,
+            AkariPhysics_OT_CalcPhysics,
+            AkariPhysics_OT_AddActivePhysics,
+            AkariPhysics_OT_ApplyPhysics
+            )
+
+def register():
+    global classes
+    for cls in classes:
+        register_class(cls)
+
+def unregister():
+    global classes
+    for cls in classes:
+        unregister_class(cls)
