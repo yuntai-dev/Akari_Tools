@@ -1,9 +1,17 @@
+'''
+Author: your name
+Date: 2022-03-16 18:45:46
+LastEditTime: 2022-03-17 10:07:42
+LastEditors: Please set LastEditors
+Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+FilePath: \akari_tools\__init__.py
+'''
 bl_info = {
 	"name": "Akari Tools",
 	"description": "Demo addon for showcasing the blender-addon-updater module",
 	"author": "Patrick W. Crawford, neomonkeus",
-	"version": (1, 1, 3),
-	"blender": (2, 80, 0),
+	"version": (1, 1, 4),
+	"blender": (3, 1, 0),
 	"location": "View 3D",
 	"warning": "",
 	"wiki_url": "",
@@ -68,6 +76,7 @@ from . import BakeVertexAO
 from . import CleanMesh
 from . import QuickPhysics
 from . import BridgeTools
+from . import AniTools
 
 def register():
 	AddNode.register()
@@ -76,6 +85,7 @@ def register():
 	CleanMesh.register()
 	QuickPhysics.register()
 	BridgeTools.register()
+	AniTools.register()
 
 	bpy.types.Scene.addonprops = PointerProperty(type=addonpropgroup)
 	bpy.types.WindowManager.asset_sketcher = PointerProperty(type=addonpropgroup)
@@ -88,6 +98,7 @@ def unregister():
 	CleanMesh.unregister()
 	QuickPhysics.unregister()
 	BridgeTools.unregister()
+	AniTools.unregister()
 
 	del bpy.types.Scene.addonprops
 	del bpy.types.WindowManager.asset_sketcher
