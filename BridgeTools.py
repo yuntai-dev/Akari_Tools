@@ -7,7 +7,7 @@ C = bpy.context
 class BridgeToolsPanel(bpy.types.Panel):
     bl_idname = "OBJECT_PT_BridgeTools"
     bl_label = "Bridge Tools"
-    bl_category = "Edit"
+    bl_category = "Tool"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     bl_order = 15

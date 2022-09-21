@@ -7,7 +7,7 @@ from bpy.utils import register_class, unregister_class
 class BakeVertexAOPanel(bpy.types.Panel):
     bl_idname = "OBJECT_PT_Bake_Vertex_AO"
     bl_label = "烘焙顶点色AO"
-    bl_category = "Edit"
+    bl_category = "Tool"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     bl_order = 12

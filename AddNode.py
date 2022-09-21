@@ -4,6 +4,7 @@ from bpy.utils import register_class, unregister_class
 from bpy import context
 import mathutils 
 import os
+from bpy_extras.io_utils import ExportHelper
 from bpy.props import (StringProperty,
                        BoolProperty,
                        IntProperty,
@@ -11,6 +12,7 @@ from bpy.props import (StringProperty,
                        FloatVectorProperty,
                        EnumProperty,
                        PointerProperty,
+                       CollectionProperty
                        )
 from bpy.types import (Panel,
                        Menu,
@@ -34,6 +36,8 @@ class AddNodePanel(bpy.types.Panel):
         layout.prop(addonprops,'addimage_path')
         layout.operator('object.importimage')
         layout.operator('object.texcolorspace')
+        layout.operator('object.matchvertexcolorname')
+        layout.operator('object.batchimporttex', )
         return 
 
 class ACES_PT_Panel(bpy.types.Panel):
@@ -156,16 +160,20 @@ class ImportImageOperator(bpy.types.Operator):
     bl_label = "Import Image"
 
     def execute(self, context):
+        bpy.ops.buttons.file_browse()
+
         selpath = []                                            #初始化贴图路径
         data = bpy.data
         context = bpy.context
         scene = context.scene
-        selpath = scene.addonprops.addimage_path                            #选中贴图路径
-        list_file = os.listdir(selpath)                         #路径中所有贴图list
+        selfiles = scene.addonprops.addimage_path                          #选中贴图路径
 
-        DIF = 'DIF'
-        ORM = 'ORM'
-        NRM = 'NRM'
+        # selpath = scene.addonprops.addimage_path                            #选中贴图路径
+        # list_file = os.listdir(selpath)                         #路径中所有贴图list
+
+        DIF = ['C']
+        ORM = ['M']
+        NRM = ['N']
 
         selobj_list = bpy.context.active_object                 #获取选中的模型
         selobj_name = selobj_list.name_full                      #获取选中模型的名称
@@ -173,74 +181,76 @@ class ImportImageOperator(bpy.types.Operator):
         actmat_name = actmat.name_full
         nodetree = bpy.data.materials[actmat_name].node_tree
 
-        TexNinMatN = [M for M in list_file if actmat_name in M]         #筛选含有材质关键字的文件
-        SSS_DIF = [T for T in TexNinMatN if DIF in T]                   #筛选含有材质和贴图关键字的文件
-        SSS_ORM = [T for T in TexNinMatN if ORM in T]  
-        SSS_NRM = [T for T in TexNinMatN if NRM in T]
-        SSS_Tex = SSS_DIF + SSS_ORM + SSS_NRM
-        SSSmatIP = [DIF] + [ORM] + [NRM]
 
-        if actmat_name in ",".join(TexNinMatN):
-            OPnode = bpy.data.materials[actmat_name].node_tree.nodes.active
-            OPnodeloc = OPnode.location
-            SSSnodelocoff = mathutils.Vector((-200.0, 0.0))
-            Texnodelocoff = mathutils.Vector((-400.0, 0.0))
-            
-            blendfile = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'Blender Node')
-            blendfile = os.path.join(blendfile, 'SSS_Mat.blend')
-            section   = '\\NodeTree\\'
-            nodegroups    = 'SSS_Mat'
-            
-            directory = blendfile + section
-            
-            bpy.ops.wm.link(filename=nodegroups, directory=directory)
-            bpy.ops.node.add_node(type="ShaderNodeGroup", use_transform=True, settings=[{"name":"node_tree", "value":"bpy.data.node_groups['SSS_Mat']"}])
-            SSSnode = bpy.data.materials[actmat_name].node_tree.nodes.active
-            SSSnode.location = OPnodeloc + SSSnodelocoff
-            SSSnodeloc = SSSnode.location
-            
-            SSSNorP = SSSnode.inputs[7]
-            SSSNorP.default_value = (1)
-            SSSNorI = SSSnode.inputs[8]
-            SSSNorI.default_value = (1)
-            
-            nodetree.links.new(SSSnode.outputs[0], OPnode.inputs[0])
+        # TexNinMatN = [M for M in list_file if actmat_name in M]         #筛选含有材质关键字的文件
+        # SSS_DIF = [T for T in TexNinMatN if DIF in T]                   #筛选含有材质和贴图关键字的文件
+        # SSS_ORM = [T for T in TexNinMatN if ORM in T]  
+        # SSS_NRM = [T for T in TexNinMatN if NRM in T]
+        # SSS_Tex = SSS_DIF + SSS_ORM + SSS_NRM
+        # SSSmatIP = [DIF] + [ORM] + [NRM]
 
-            Texmap = {SSS_Tex[0]:SSSmatIP[0],SSS_Tex[1]:SSSmatIP[1],SSS_Tex[2]:SSSmatIP[2]}
-            SSSmatin = 0,3,6
-            Downlocoff = mathutils.Vector((0.0, -300.0))
+        print(selfiles)
+        # if actmat_name in ",".join(TexNinMatN):
+        #     OPnode = bpy.data.materials[actmat_name].node_tree.nodes.active
+        #     OPnodeloc = OPnode.location
+        #     SSSnodelocoff = mathutils.Vector((-200.0, 0.0))
+        #     Texnodelocoff = mathutils.Vector((-400.0, 0.0))
             
-            for i in range(0, len(SSS_Tex)):
-                Tex = SSS_Tex[i]
-                SpStr = str(Tex.split('_'))
+        #     blendfile = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'Blender Node')
+        #     blendfile = os.path.join(blendfile, 'SSS_Mat.blend')
+        #     section   = '\\NodeTree\\'
+        #     nodegroups    = 'SSS_Mat'
+            
+        #     directory = blendfile + section
+            
+        #     bpy.ops.wm.link(filename=nodegroups, directory=directory)
+        #     bpy.ops.node.add_node(type="ShaderNodeGroup", use_transform=True, settings=[{"name":"node_tree", "value":"bpy.data.node_groups['SSS_Mat']"}])
+        #     SSSnode = bpy.data.materials[actmat_name].node_tree.nodes.active
+        #     SSSnode.location = OPnodeloc + SSSnodelocoff
+        #     SSSnodeloc = SSSnode.location
+            
+        #     SSSNorP = SSSnode.inputs[7]
+        #     SSSNorP.default_value = (1)
+        #     SSSNorI = SSSnode.inputs[8]
+        #     SSSNorI.default_value = (1)
+            
+        #     nodetree.links.new(SSSnode.outputs[0], OPnode.inputs[0])
+
+        #     Texmap = {SSS_Tex[0]:SSSmatIP[0],SSS_Tex[1]:SSSmatIP[1],SSS_Tex[2]:SSSmatIP[2]}
+        #     SSSmatin = 0,3,6
+        #     Downlocoff = mathutils.Vector((0.0, -300.0))
+            
+        #     for i in range(0, len(SSS_Tex)):
+        #         Tex = SSS_Tex[i]
+        #         SpStr = str(Tex.split('_'))
                 
-                bpy.ops.image.open(filepath=selpath+Tex, directory=selpath, files=[{"name":Tex, "name":Tex}], relative_path=True, show_multiview=False)        #根据路径和筛选条件导入指定路径下的贴图文件
-                Texture = bpy.data.images[Tex]                                                      #遍历获取DIF图像
-                print(i)
+        #         bpy.ops.image.open(filepath=selpath+Tex, directory=selpath, files=[{"name":Tex, "name":Tex}], relative_path=True, show_multiview=False)        #根据路径和筛选条件导入指定路径下的贴图文件
+        #         Texture = bpy.data.images[Tex]                                                      #遍历获取DIF图像
+        #         print(i)
                 
-                if Texmap[SSS_Tex[i]] == DIF:                                                 #判断图像关键字类型，ORM和NRM色彩空间设定为non-color
-                    Texture.colorspace_settings.name = 'sRGB'
-                else:
-                    Texture.colorspace_settings.name = 'Non-Color'
+        #         if Texmap[SSS_Tex[i]] == DIF:                                                 #判断图像关键字类型，ORM和NRM色彩空间设定为non-color
+        #             Texture.colorspace_settings.name = 'sRGB'
+        #         else:
+        #             Texture.colorspace_settings.name = 'Non-Color'
                     
-                bpy.ops.node.add_node(type="ShaderNodeTexImage", use_transform=False)           #添加一个图像节点
-                Texnode = data.materials[actmat_name].node_tree.nodes.active                    #选择选中物体材质中，节点树里激活的节点
-                Texnode.image = Texture                                                         #image name按遍历的内容设定
-                if i==0:
-                    Texnode.location = SSSnodeloc + Texnodelocoff                     #节点依父节点偏移
-                    DIFloc = Texnode.location
-                elif i==1:
-                    ORMloc = DIFloc + Downlocoff
-                    Texnode.location = ORMloc                     #节点依父节点偏移
+        #         bpy.ops.node.add_node(type="ShaderNodeTexImage", use_transform=False)           #添加一个图像节点
+        #         Texnode = data.materials[actmat_name].node_tree.nodes.active                    #选择选中物体材质中，节点树里激活的节点
+        #         Texnode.image = Texture                                                         #image name按遍历的内容设定
+        #         if i==0:
+        #             Texnode.location = SSSnodeloc + Texnodelocoff                     #节点依父节点偏移
+        #             DIFloc = Texnode.location
+        #         elif i==1:
+        #             ORMloc = DIFloc + Downlocoff
+        #             Texnode.location = ORMloc                     #节点依父节点偏移
                     
-                elif i==2:
-                    NRMloc = ORMloc + Downlocoff
-                    Texnode.location = NRMloc                     #节点依父节点偏移
+        #         elif i==2:
+        #             NRMloc = ORMloc + Downlocoff
+        #             Texnode.location = NRMloc                     #节点依父节点偏移
                     
-                nodetree.links.new(Texnode.outputs[0], SSSnode.inputs[SSSmatin[i]])
+        #         nodetree.links.new(Texnode.outputs[0], SSSnode.inputs[SSSmatin[i]])
 
-        else:
-            print('non')
+        # else:
+        #     print('non')
 
         return {'FINISHED'}
 
@@ -250,12 +260,13 @@ class ACESTexToolOperator(bpy.types.Operator):
     bl_label = "ACES SRGB色彩空间切换"
 
     def execute(self, context):
-        ColType = ['albedo','c','color','diffuse','base color','col']
+        ColType = ['albedo','c','color','diffuse','base color','col','bc']
         HDRType = ['hdr','exr']
         device = bpy.data.scenes['Scene'].display_settings.display_device
         images = bpy.data.images
         for i in images:
-            sptype = i.name.split('.')
+            sptype = i.name.lower().split('.')
+            print(sptype)
             if sptype[-1] in HDRType:   #后缀为hdr和exr的hdri图像文件，色彩空间设置为ACES线性
                 if device == 'sRGB':
                     i.colorspace_settings.name = 'Linear'
@@ -268,8 +279,10 @@ class ACESTexToolOperator(bpy.types.Operator):
                     col = col.lower()
                     if col in ColType:
                         if device == 'sRGB':
+                            print('srgb')
                             i.colorspace_settings.name = 'sRGB'
                         elif device == 'ACES':
+                            print('aces')
                             i.colorspace_settings.name = 'Utility - sRGB - Texture'
 
         return {'FINISHED'}
@@ -282,20 +295,44 @@ class TexColorSpaceOperator(bpy.types.Operator):
 
     def execute(self, context):
         texs = bpy.data.images
+        color = ["c","col","color"]
+        emi = ["emi","e","emission"]
         for t in texs:
-            tname = t.name.split('_')
-            # for tn in tname:
-            if "C" in tname[-1]:
-                t.colorspace_settings.name = "sRGB"
-            if "M" in tname[-1]:
-                t.colorspace_settings.name = "Non-Color"
-            if "N" in tname[-1]:
-                t.colorspace_settings.name = "Non-Color"
+            tname = t.name.lower().split('_')
+            t.colorspace_settings.name = "Raw"
+            for c in color:
+                if c in tname[-1]:
+                    t.colorspace_settings.name = "sRGB"     
+            for e in emi:
+                if e in tname[-1]:
+                    t.colorspace_settings.name = "sRGB"     
         return {'FINISHED'}
 
+class MatchVertexColorNameOperator(bpy.types.Operator):
+    bl_idname = "object.matchvertexcolorname"
+    bl_label = "顶点色通道命名匹配"
 
+    def execute(self, context):
+        selobjs = bpy.context.selected_objects
+        vertexcolorname = "Col"
+        for o in selobjs:
+            meshname = bpy.data.objects[o.name_full].to_mesh().name_full
+            bpy.data.meshes[meshname].vertex_colors[0].name = vertexcolorname
+        return {'FINISHED'}
 
+class BatchImportTexOperator(bpy.types.Operator):
+    bl_idname = "object.batchimporttex"
+    bl_label = "批量导入贴图"
 
+    files = CollectionProperty(type=PropertyGroup)
+    filepath = bpy.props.StringProperty(subtype="FILE_PATH")
+
+    def execute(self, context):
+        print(self.filepath)
+        # directory = os.path.dirname(self.filepath)
+
+        # print ("Folder name:", os.path.dirname(self.filepath))
+        return {'FINISHED'}
 
 
 classes = (AddNodePanel,
@@ -304,7 +341,10 @@ classes = (AddNodePanel,
             ImportHDRImatOperator,
             ImportImageOperator,
             ACESTexToolOperator,
-            TexColorSpaceOperator)
+            TexColorSpaceOperator,
+            MatchVertexColorNameOperator,
+            BatchImportTexOperator,
+            )
 
 def register():
     global classes

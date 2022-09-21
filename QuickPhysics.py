@@ -6,7 +6,7 @@ from mathutils import Matrix
 class PhysicsPanel(bpy.types.Panel):
     bl_idname = "OBJECT_PT_PhysicsPanel"
     bl_label = "快速刚体碰撞"
-    bl_category = "Edit"
+    bl_category = "Tool"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     bl_order = 11
@@ -16,18 +16,18 @@ class PhysicsPanel(bpy.types.Panel):
         wm = context.window_manager
         layout = self.layout
         row = layout.row()
-        layout.prop(wm.asset_sketcher,'physics_friction', text="Friction",slider=True)
-        layout.prop(wm.asset_sketcher,'physics_time_scale', text="Time Scale")
-        # layout.operator('asset_sketcher.calc_physics')
-        if not wm.asset_sketcher.running_physics_calculation:
-            op = row.operator('asset_sketcher.calc_physics',text = "开始模拟")
+        layout.prop(wm.quick_physics,'physics_friction', text="Friction",slider=True)
+        layout.prop(wm.quick_physics,'physics_time_scale', text="Time Scale")
+        # layout.operator('quick_physics.calc_physics')
+        if not wm.quick_physics.running_physics_calculation:
+            op = row.operator('quick_physics.calc_physics',text = "开始模拟")
         else:
-            row.prop(wm.asset_sketcher,'running_physics_calculation', text="Cancel Calculation",icon="X")
+            row.prop(wm.quick_physics,'running_physics_calculation', text="Cancel Calculation",icon="X")
 
 
 
 class AkariPhysics_OT_CalcPhysics(bpy.types.Operator):
-    bl_idname = "asset_sketcher.calc_physics"
+    bl_idname = "quick_physics.calc_physics"
     bl_label = "Calculate Physics"
     bl_description = ""
     bl_options = {"REGISTER"}
@@ -46,7 +46,7 @@ class AkariPhysics_OT_CalcPhysics(bpy.types.Operator):
         return True
 
     def add_passive_bodies(self, context, add):
-        asset_sketcher = context.window_manager.asset_sketcher
+        quick_physics = context.window_manager.quick_physics
         active_object = context.active_object
 
         for obj in context.visible_objects:
@@ -54,7 +54,7 @@ class AkariPhysics_OT_CalcPhysics(bpy.types.Operator):
                 context.view_layer.objects.active = obj
                 if add and obj.rigid_body == None:
                     bpy.ops.rigidbody.object_add()
-                    obj.rigid_body.friction = asset_sketcher.physics_friction
+                    obj.rigid_body.friction = quick_physics.physics_friction
                     obj.rigid_body.type = "PASSIVE"
                     obj.rigid_body.collision_shape = "MESH"
                 elif not add and obj.rigid_body != None:
@@ -74,9 +74,9 @@ class AkariPhysics_OT_CalcPhysics(bpy.types.Operator):
             return {"CANCELLED"}
 
         wm = context.window_manager
-        asset_sketcher = context.window_manager.asset_sketcher
+        quick_physics = context.window_manager.quick_physics
         wm.modal_handler_add(self)
-        asset_sketcher.running_physics_calculation = True
+        quick_physics.running_physics_calculation = True
 
         if context.scene.rigidbody_world == None:
             bpy.ops.rigidbody.world_add()
@@ -89,7 +89,7 @@ class AkariPhysics_OT_CalcPhysics(bpy.types.Operator):
         self.use_split_impulse = context.scene.rigidbody_world.use_split_impulse
         self.world_time_scale = context.scene.rigidbody_world.time_scale
 
-        context.scene.rigidbody_world.time_scale = asset_sketcher.physics_time_scale
+        context.scene.rigidbody_world.time_scale = quick_physics.physics_time_scale
         context.scene.render.fps = 24
         context.scene.frame_start = 0
         context.scene.frame_end = 10000
@@ -108,8 +108,8 @@ class AkariPhysics_OT_CalcPhysics(bpy.types.Operator):
         return {"RUNNING_MODAL"}
 
     def exit_modal(self, context, wm):
-        asset_sketcher = context.window_manager.asset_sketcher
-        asset_sketcher.running_physics_calculation = False
+        quick_physics = context.window_manager.quick_physics
+        quick_physics.running_physics_calculation = False
         bpy.ops.screen.animation_play()
         bpy.ops.object.as_apply_physics()
         # bpy.ops.screen.animation_cancel()
@@ -128,8 +128,8 @@ class AkariPhysics_OT_CalcPhysics(bpy.types.Operator):
 
     def modal(self, context, event):
         wm = context.window_manager
-        asset_sketcher = context.window_manager.asset_sketcher
-        if event.type in {"ESC"} or context.scene.frame_current >= 10000 or not asset_sketcher.running_physics_calculation:
+        quick_physics = context.window_manager.quick_physics
+        if event.type in {"ESC"} or context.scene.frame_current >= 10000 or not quick_physics.running_physics_calculation:
             self.exit_modal(context, wm)
             return {"CANCELLED"}
         wm.progress_update(context.scene.frame_current)
@@ -142,13 +142,13 @@ class AkariPhysics_OT_AddActivePhysics(bpy.types.Operator):
     bl_description = "Sets up Assets as rigidbody objects."
 
     def execute(self, context):
-        asset_sketcher = context.window_manager.asset_sketcher
+        quick_physics = context.window_manager.quick_physics
         active_object = context.active_object
         for obj in context.selected_objects:
             if obj.type == "MESH":
                 context.view_layer.objects.active = obj
                 bpy.ops.rigidbody.object_add()
-                obj.rigid_body.friction = asset_sketcher.physics_friction
+                obj.rigid_body.friction = quick_physics.physics_friction
         context.view_layer.objects.active = active_object
 
         return {'FINISHED'}

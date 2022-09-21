@@ -1,4 +1,6 @@
+from itertools import count
 import bpy
+import bmesh
 from bpy.utils import register_class, unregister_class
 from mathutils import *
 D = bpy.data
@@ -7,7 +9,7 @@ C = bpy.context
 class ToolsPanel(bpy.types.Panel):
     bl_idname = "OBJECT_PT_3DTools"
     bl_label = "3D Tools"
-    bl_category = "Edit"
+    bl_category = "Tool"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     bl_order = 10
@@ -72,11 +74,21 @@ class BatchSetOriginOperator(bpy.types.Operator):
     bl_label = "Batch Set Origin"
 
     def execute(self,context):
-        selobj = bpy.context.selected_objects
-        for i in selobj:
-            bpy.context.view_layer.objects.active = i
-            print(bpy.data.objects[i.name_full].dimensions.z)
-            # bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY')
+        vert: bmesh.types.BMVert
+
+        actobj = bpy.context.active_object
+        actmesh = actobj.to_mesh()
+        bm = bmesh.new()
+        edge_count = None
+        
+        bm.from_mesh(actmesh)
+        for vert in bm.verts:
+            edge_count = 0
+            for vert_link_edge in vert.link_edges:
+                edge_count += 1
+            print(vert, edge_count)
+
+        bm.to_mesh(actmesh)
         return{'FINISHED'}
 
 classes = (ToolsPanel,
